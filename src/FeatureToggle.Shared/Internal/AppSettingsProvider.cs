@@ -1,15 +1,26 @@
-﻿#if NETFULL || NETCORE
+﻿#if NETFULL || NETCORE || NETSTANDARD
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using FeatureToggle;
 
 
-#if NETFULL 
+#if NETFULL
 using System.Configuration;
-using System.Web.Script.Serialization;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+#endif
+
+#if NETSTANDARD
+using System.Configuration;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+
 #endif
 
 #if NETCORE
@@ -74,7 +85,7 @@ namespace FeatureToggle.Internal
 
         }
 
-#if NETFULL
+#if NETFULL || NETSTANDARD
         private bool GetJsonBoolFromServer(string url)
         {
             string json;
@@ -86,9 +97,22 @@ namespace FeatureToggle.Internal
 
             AssertValidJson(json);
 
-            var serializer = new JavaScriptSerializer();
+            //var serializer = JsonSerializer.
 
-            var toggleSettings = serializer.Deserialize<JsonEnabledResponse>(json);
+            //var toggleSettings = serializer.Deserialize<JsonEnabledResponse>(json);
+
+            var toggleSettings = new JsonEnabledResponse();
+
+            var serializer = new DataContractJsonSerializer(typeof(JsonEnabledResponse));
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            {
+                toggleSettings = serializer.ReadObject(stream) as JsonEnabledResponse;
+            }
+
+            if (toggleSettings == null)
+            {
+                throw new SerializationException("Error deserializing type JsonEnabledResponse");
+            }
 
             return toggleSettings.Enabled;    
         }
@@ -226,7 +250,7 @@ namespace FeatureToggle.Internal
 
         private string GetConfigValue(string key)
         {
-#if NETFULL
+#if NETFULL || NETSTANDARD
             return ConfigurationManager.AppSettings[key];
 #else
 
@@ -243,7 +267,7 @@ namespace FeatureToggle.Internal
 
         private string[] GetAllConfigKeys()
         {
-#if NETFULL
+#if NETFULL || NETSTANDARD
             return ConfigurationManager.AppSettings.AllKeys;
 #else
             var allToggleSettings = Configuration.GetSection(ToggleConfigurationSettings.Prefix.Replace(".","")).GetChildren();

@@ -1,4 +1,4 @@
-﻿#if NETFULL
+﻿#if NETFULL || NETSTANDARD
 
 using System;
 using System.Configuration;

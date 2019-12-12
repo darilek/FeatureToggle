@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <TargetFrameworks>net461;uap10.0;netcoreapp1.0;</TargetFrameworks>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <TargetFrameworks>net461;netstandard20;netcoreapp1.0;</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>4.0.2</Version>
+    <Version>4.0.3</Version>
     <Authors>Jason Roberts - dontcodetired.com</Authors>
     <Company />
     <Product />
@@ -16,6 +16,7 @@
     <PackageIconUrl>https://github.com/jason-roberts/FeatureToggle/raw/master/etc/v4/logo.png</PackageIconUrl>
     <PackageTags>feature toggle branch merge featuretoggle cd continuous delivery</PackageTags>
     <PackageReleaseNotes>For release notes and history see https://github.com/jason-roberts/FeatureToggle/blob/master/Release-Notes.md</PackageReleaseNotes>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
@@ -54,14 +55,22 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <DefineConstants>NETFULL</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard20' ">
+    <DefineConstants>NETSTANDARD</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web.Extensions" />   
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard20' ">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\FeatureToggle.Common\FeatureToggle.Common.csproj" />

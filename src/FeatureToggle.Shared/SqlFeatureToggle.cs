@@ -1,4 +1,4 @@
-﻿#if NETFULL
+﻿#if NETFULL || NETSTANDARD
 
 
 // TODO: net core sql support?
